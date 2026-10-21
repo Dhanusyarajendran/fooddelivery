@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FaCheckCircle, FaEyeSlash, FaUser, FaEye, FaLock, FaArrowRight, FaUserPlus } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
-const Login = ({ onLoginSuccess, onClose }) => {
+const Login = ({ onLoginSuccess }) => {
 
   const [showToast, setShowToast] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -14,10 +14,24 @@ const Login = ({ onLoginSuccess, onClose }) => {
     }
   );
 
-  useEffect(() =>{
+  useEffect(() => {
     const stored = localStorage.getItem('loginData');
-    if(stored) setFormData(JSON.parse(stored))
-  })
+    if (!stored) return;
+
+    const savedData = JSON.parse(stored);
+    if (
+      savedData &&
+      typeof savedData.username === 'string' &&
+      typeof savedData.password === 'string' &&
+      savedData.rememberMe === true
+    ) {
+      setFormData({
+        username: savedData.username,
+        password: savedData.password,
+        rememberMe: true
+      });
+    }
+  }, []);
 
 
   const handleChange = ({target: {name, value, type, checked }}) =>{
@@ -26,7 +40,7 @@ const Login = ({ onLoginSuccess, onClose }) => {
 
 
   const handleSubmit = (e) =>{
-    e.preventDefault;
+    e.preventDefault();
     formData.rememberMe ? localStorage.setItem('loginData', JSON.stringify(formData)) : localStorage.removeItem('loginData');
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000)
@@ -73,14 +87,20 @@ const toggleshowPassword = () =>{
         value={formData.password}
         />
 
-      <button type='button' onClick={toggleshowPassword} className='absolute right-3 top-1/2 text-amber-400 transform -translate-y-1/2'>
+      <button
+        type='button'
+        onClick={toggleshowPassword}
+        aria-label={showPassword ? 'Hide password' : 'Show password'}
+        aria-pressed={showPassword}
+        className='absolute right-3 top-1/2 text-amber-400 transform -translate-y-1/2'
+      >
        {showPassword ?  <FaEyeSlash />: <FaEye />}
       </button>
     </div>
 
     <div className='mt-2 flex gap-2 items-center ml-1'>
       <label className='flex items-center'>
-        <input type='checkbox' name='checkbox' onChange={handleChange} value={formData.rememberMe} className='form-checkbox rounded w-5 h-4 text-amber-400 rounded focus:ring-amber-600'/>
+        <input type='checkbox' name='rememberMe' onChange={handleChange} checked={formData.rememberMe} className='form-checkbox rounded w-5 h-4 text-amber-400 rounded focus:ring-amber-600'/>
       </label>
       <span className='text-amber-100'>Remember me</span>
     </div>
@@ -92,7 +112,7 @@ const toggleshowPassword = () =>{
   </form>
 
   <div className='text-center'>
-    <Link to='/signUp' onClick={onclose} className='inline-flex items-center gap-2 text-amber-400 hover:text-amber-600 transition-colors'>
+    <Link to='/signUp' className='inline-flex items-center gap-2 text-amber-400 hover:text-amber-600 transition-colors'>
     <FaUserPlus /> Create New Account
     </Link>
 

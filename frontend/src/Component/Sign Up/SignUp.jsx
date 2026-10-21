@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
-import { FaCheckCircle, FaLockOpen } from 'react-icons/fa';
+import React, { useEffect, useState } from 'react'
+import { FaCheckCircle, FaEyeSlash, FaEye, FaArrowRight} from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+
 
 
 const AwesomeToast = ({message, icon}) =>(
@@ -16,16 +18,42 @@ const AwesomeToast = ({message, icon}) =>(
 const SignUp = () => {
 
   const[showToast, setShowToast] = useState(false);
+  const[showPassword, setShowPassword] = useState(false)
   const[formData, setFormData] = useState(
     {
       username:'',
       email:'',
       password:''
 
-    }
-  );
+    });
+  const navigate = useNavigate();
+
+//for toast
+
+useEffect(() =>{
+  if(showToast)
+  {
+    const timer = setTimeout(() => {
+      setShowToast(false)
+      navigate('/login');
+    }, 2000);
+    return () => clearTimeout(timer);
+  }
+},[showToast, navigate])
 
 
+
+ const  toggleShowPassword =() =>{
+  setShowPassword(prev => !prev)
+}
+
+const handleSubmit = () =>{
+  e.preventDefault();
+  console.log('Sign Up Data:',formData);
+  setShowToast(true)
+}
+
+  
   return (
     <div className='min-h-screen flex items-center justify-center bg-[#1a120bfz] p-4'>
         {showToast && <AwesomeToast message="Sign Up Successful" icon={<FaCheckCircle />} /> }
@@ -35,23 +63,41 @@ const SignUp = () => {
           <h1 className='text-center text-amber-400 text-2xl font-bold'>Create Account</h1>
         
 
-        <form>
+        <form onSubmit={handleSubmit}>
            <div className='relative flex items-center rounded-lg shadow bg-amber-900/25 py-2 px-2 gap-3 my-5'>
             <input type='username' name='username' placeholder='username' className='w-75 text-amber-400 bg-transparent placeholder-amber-400 outline-none border-none focus:outline-none focus:ring-0'
-            value={formData.username}  onChange={(e) => setFormData({...formData, username: e.target.value})} />
+            value={formData.username}  autoComplete="username" onChange={(e) => setFormData({...formData, username: e.target.value})} />
           </div>
 
           <div className='relative flex items-center rounded-lg shadow bg-amber-900/25 py-2 px-2 gap-3 my-5'>
              <input type='email' name='email' placeholder='email' className='w-75 text-amber-400 bg-transparent placeholder-amber-400 outline-none border-none focus:outline-none focus:ring-0'
-             onChange={handleChange} value={formData.email} />
+             value={formData.email} autoComplete="email"  onChange={(e) => setFormData({...formData, email: e.target.value})}/>
           </div>
 
          <div className='relative flex items-center rounded-lg shadow bg-amber-900/25 py-2 px-2 gap-3 my-5'>
-             <input type='password' name='password' placeholder='password' className='w-75 text-amber-400 bg-transparent placeholder-amber-400 outline-none border-none focus:outline-none focus:ring-0'
-             onChange={handleChange} value={formData.password}/>
+             <input type={showPassword ? 'text' : 'password'}
+              name='password' placeholder='password' className='w-75 text-amber-400 bg-transparent placeholder-amber-400 outline-none border-none focus:outline-none focus:ring-0'
+             value={formData.password} autoComplete="password" onChange={(e) => setFormData({...formData, password: e.target.value})}/>
+             <button type='button' onClick={toggleShowPassword} className='absolute right-3 top-1/2 text-amber-400 transform -translate-y-1/2'>
+                    {showPassword ?  <FaEyeSlash />: <FaEye />}
+                  </button>
           </div>
 
+          <button type='submit' className='flex items-center gap-2 bg-gradient-to-r from-amber-400 to-amber-600 shadow w-full text-black rounded-xl p-2 justify-center mt-4 font-bold
+             hover:scale-105 duration-300 transition-transform'>
+              Sign Up 
+             </button>
+
         </form>
+
+      <div className='mt-6 text-center'>
+        <Link to='/login' className='group inline-flex items-center text-amber-400 hover:text-amber-600 transition-all duration-300'>
+        <FaArrowRight className='mr-2 transform -translate-x-2 opacity-0  group-hover:translate-x-0
+         group-hover:opacity-10 transition-all duration-300 ' />
+              <span className='transform group-hover:-translate-2 transition-all duration-300'>Back To Login</span>
+        </Link>
+        </div>
+
         </div>
     </div>
   )

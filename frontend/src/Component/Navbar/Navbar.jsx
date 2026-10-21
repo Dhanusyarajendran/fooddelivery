@@ -281,7 +281,6 @@ const renderMobileAuthButton = () =>{
 
           <Login
             onLoginSuccess={handleLoginSuccess}
-            onClose={() => navigate('/')}
           />
         </div>
       </div>
@@ -291,4 +290,3 @@ const renderMobileAuthButton = () =>{
 };
 
 export default Navbar;
-
